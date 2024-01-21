@@ -97,6 +97,12 @@ run-local-help:
 	go run app/services/sales-api/main.go --help
 
 # ==============================================================================
+# Metrics and Tracing
+
+metrics-view-local:
+	expvarmon -ports="localhost:4000" -vars="build,requests,goroutines,errors,panics,mem:memstats.Alloc"
+
+# ==============================================================================
 # Modules support
 
 tidy:
