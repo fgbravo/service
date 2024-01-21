@@ -56,17 +56,27 @@ dev-down-local:
 dev-down:
 	kind delete cluster --name $(KIND_CLUSTER)
 
-# ==============================================================================
-
-run-local:
-	go run app/services/sales-api/main.go
-
-# ==============================================================================
-
 dev-status:
 	kubectl get nodes -o wide
 	kubectl get svc -o wide
 	kubectl get pods -o wide --watch --all-namespaces
+
+dev-logs:
+	kubectl logs --namespace=$(NAMESPACE) -l app=$(APP) --all-containers=true -f --tail=100
+
+# ------------------------------------------------------------------------------
+
+dev-load:
+	kind load docker-image $(SERVICE_IMAGE) --name $(KIND_CLUSTER)
+
+dev-apply:
+	kustomize build zarf/k8s/dev/sales | kubectl apply -f -
+	kubectl wait pods --namespace=$(NAMESPACE) --selector app=$(APP) --timeout=120s --for=condition=Ready
+
+# ==============================================================================
+
+run-local:
+	go run app/services/sales-api/main.go
 
 # ==============================================================================
 # Modules support
